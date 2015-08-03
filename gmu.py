@@ -2,6 +2,7 @@ import requests
 import xlsxwriter
 import xlrd
 from datetime import datetime
+from pandas import date_range
 
 # Define funtion for pulling in GMU excel file.
 def dl_xls(url, target):
@@ -28,24 +29,30 @@ date_len = len(value_list)
 print date_len
 
 # Create a new workbook with sheet for Tableau
-workbook = xlsxwriter.Workbook('MonthlySales_DC.xls')
+workbook = xlsxwriter.Workbook('MonthlySales_DC.xlsx')
 ForTableau = workbook.add_worksheet('ForTableau')
 
-date_format = workbook.add_format({'num_format': 'mm/dd/yyyy'})
+date_format = workbook.add_format({'num_format': 'm/d/yyyy'})
 
 # Write the column headers
 ForTableau.write('A1', 'Date')
 ForTableau.write('B1', 'Sales')
 
 # We want to start at 01/01/2009
-start_date = 39814.00
+start_date = '01/31/2009'
 
-# Write the start date
-ForTableau.write('A2', start_date, date_format)
+# Convert to datetime object
+start_datetime = datetime.strptime(start_date, "%m/%d/%Y")
 
-# Loop write the rest of the rows with a +1 month formula (EDATE)
-for row in range(2, date_len):
-	ForTableau.write(row, 0, "=EDATE(A"+str(row)+", 1)", date_format)
+# Create list of dates
+dates = date_range(start_date, periods=date_len, freq='M')
+
+#Loop write the list of dates in the first row. 
+row = 1
+
+for date in dates:
+	ForTableau.write(row, 0, date)
+	row += 1
 
 # Loop write the list of values in column 2
 val_row = 1
@@ -54,7 +61,6 @@ for value in value_list:
 	val_row += 1
 
 workbook.close()
-
 
 
 

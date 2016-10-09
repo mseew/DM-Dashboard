@@ -54,13 +54,17 @@ for year in years:
 
 		br.submit()
 
-		#Select the right form on the second page.
+		#Select the first form on the second page.
 		br.select_form(nr=1)
-		#Make the controls in the form non-read only; we need to back-fill some values.
+		
+		#Make the controls in the form not read-only; we need to back-fill some values.
 		br.form.set_all_readonly(False)
 
 		#This edits the year selection to be 2015. 
 		br.form['Y'] = year
+		
+		#Select the second form on the second page.
+		br.select_form(nr=2)
 
 		#The control for DC's "Counties" is empty, so create the right object in it. 
 		item = mechanize.Item(br.form.find_control(name='C'), {'contents': '001000', 'value': '001000', 'label': '001000'})
